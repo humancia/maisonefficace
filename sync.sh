@@ -50,6 +50,7 @@ if [ -d .git ]; then
     echo "ℹ️  Aucun changement à publier."
   else
     git commit -m "Mise à jour du site depuis Claude Design ($(date '+%Y-%m-%d %H:%M'))" -m "Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
+    git pull --rebase
     git push
     echo "🚀 Poussé — le déploiement automatique est en cours."
   fi
