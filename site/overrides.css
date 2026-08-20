@@ -1,0 +1,31 @@
+/* Ajustements responsive pour maisonefficace.ca — le design du canvas est pensé desktop.
+   Sélecteurs basés sur les ids/styles générés par Design pour survivre aux re-exports. */
+@media (max-width: 900px) {
+  #cursor-dot { display: none !important; }
+
+  nav { gap: 16px !important; }
+  nav > a { display: none !important; }
+  nav > a[href="#soumission"] { display: inline-block !important; }
+
+  /* Héro : colonne unique, plus de sticky */
+  section[style*="170vh"] {
+    grid-template-columns: 1fr !important;
+    min-height: auto !important;
+  }
+  section[style*="170vh"] > div {
+    position: static !important;
+    min-height: auto !important;
+    height: auto !important;
+    padding-top: 6vh !important;
+  }
+  #stage3d { height: 52vh !important; }
+
+  /* Sections en colonne unique */
+  #services > div,
+  #thermopompe,
+  #isolation { grid-template-columns: 1fr !important; }
+  #stage3d-duo, #stage3d-iso { height: 340px !important; }
+
+  /* Statistiques : 2 colonnes */
+  div[style*="repeat(4,minmax"] { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}

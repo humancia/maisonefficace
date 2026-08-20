@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,500;0,600;0,700&display=swap">
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+  <script src="./image-slot.js"></script>
+  <style>
+    html{scroll-behavior:smooth}
+    body{margin:0;background:#f6f5f2;color:#1d1c1a;font-family:'Instrument Sans',sans-serif;text-wrap:pretty;overflow-x:hidden}
+    a{color:#1C5D42;text-decoration:none} a:hover{color:#7FB94E}
+    @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+    @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  </style>
+</helmet>
+<div style="min-height:100vh">
+  <div id="progress-bar" style="position:fixed;top:0;left:0;height:4px;width:0%;background:linear-gradient(90deg,#1C5D42,#7FB94E);z-index:100"></div>
+  <div id="cursor-dot" style="position:fixed;top:0;left:0;width:14px;height:14px;background:#7FB94E;border-radius:50%;pointer-events:none;z-index:99;mix-blend-mode:difference;transform:translate(-100px,-100px)"></div>
+
+  <nav style="position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:32px;padding:16px clamp(20px,5vw,72px);border-bottom:2px solid #d8d5d0;background:rgba(246,245,242,0.85);backdrop-filter:blur(12px)">
+    <div style="display:flex;align-items:center;gap:12px;margin-right:auto">
+      <svg width="34" height="34" viewBox="0 0 96 96"><path d="M36 92 L16 92 L16 48 L48 22 L80 48 L80 92 L60 92" fill="none" stroke="#1C5D42" stroke-width="9"></path><path d="M48 92 L48 62" fill="none" stroke="#7FB94E" stroke-width="5"></path><path d="M48 66 C38 69 28 65 24 54 C36 51 45 57 48 66 Z" fill="#7FB94E"></path><path d="M48 66 C58 69 68 65 72 54 C60 51 51 57 48 66 Z" fill="#7FB94E"></path></svg>
+      <span style="font-weight:700;font-size:20px;letter-spacing:-0.03em"><span style="color:#1d1c1a">maison</span><span style="color:#1C5D42">efficace</span><span style="color:#7FB94E">.ca</span></span>
+    </div>
+    <a href="#services" style="font-size:15px;font-weight:600">Services</a>
+    <a href="#thermopompe" style="font-size:15px;font-weight:600">Thermopompes</a>
+    <a href="#isolation" style="font-size:15px;font-weight:600">Isolation</a>
+    <a href="#soumission" style="display:inline-block;background:#1C5D42;color:#fff;font-weight:600;font-size:15px;padding:10px 18px" style-hover="background:#7FB94E;color:#0e2b1f">Soumission gratuite</a>
+  </nav>
+
+  <section style="display:grid;grid-template-columns:minmax(0,6fr) minmax(0,6fr);gap:24px;max-width:1400px;margin:0 auto;padding:0 clamp(20px,5vw,72px);min-height:170vh;align-items:start">
+    <div style="padding-top:14vh;position:sticky;top:0;align-self:start;min-height:100vh;box-sizing:border-box">
+      <p style="font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:#1C5D42;font-weight:600;margin:0 0 18px">Chauffage · Climatisation · Isolation</p>
+      <h1 style="font-weight:700;font-size:clamp(44px,5.6vw,86px);line-height:1.02;letter-spacing:-0.035em;margin:0">
+        <span style="display:block">Votre maison,</span>
+        <span style="display:block;color:#1C5D42">à la bonne</span>
+        <span style="display:block;color:#7FB94E">température.</span>
+      </h1>
+      <p style="font-size:17px;line-height:1.7;max-width:46ch;margin:28px 0 0;color:rgba(29,28,26,0.75)">Thermopompes haute efficacité, climatisation et isolation pensées ensemble — pour une facture qui fond et un confort quatre saisons, partout au Québec.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:32px">
+        <a href="#soumission" style="display:inline-block;background:#1C5D42;color:#fff;font-weight:600;font-size:16px;padding:15px 24px;transition:transform .2s" style-hover="background:#7FB94E;color:#0e2b1f;transform:translateY(-3px)">Soumission gratuite →</a>
+        <a href="#services" style="display:inline-block;border:2px solid #1d1c1a;color:#1d1c1a;font-weight:600;font-size:16px;padding:13px 24px;transition:transform .2s" style-hover="transform:translateY(-3px);background:rgba(28,93,66,0.08)">Nos services</a>
+      </div>
+      <p style="margin-top:9vh;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(29,28,26,0.5)">↓ Faites défiler — la thermopompe vous suit</p>
+    </div>
+    <div style="position:sticky;top:0;align-self:start;height:100vh;display:flex;align-items:center;justify-content:center">
+      <div id="stage3d" style="width:100%;height:min(86vh,760px);cursor:grab"></div>
+    </div>
+  </section>
+
+  <div style="background:#1C5D42;color:#f6f5f2;overflow:hidden;padding:16px 0;border-top:2px solid #144733;border-bottom:2px solid #144733">
+    <div style="display:flex;width:max-content;animation:marquee 22s linear infinite;font-weight:700;font-size:20px;letter-spacing:0.04em;gap:0">
+      <span style="white-space:nowrap;padding-right:24px">THERMOPOMPES · CLIMATISATION · ISOLATION · EFFICACITÉ ÉNERGÉTIQUE · SUBVENTIONS · CONFORT 4 SAISONS ·&nbsp;</span>
+      <span style="white-space:nowrap;padding-right:24px">THERMOPOMPES · CLIMATISATION · ISOLATION · EFFICACITÉ ÉNERGÉTIQUE · SUBVENTIONS · CONFORT 4 SAISONS ·&nbsp;</span>
+    </div>
+  </div>
+
+  <section id="services" style="max-width:1400px;margin:0 auto;padding:110px clamp(20px,5vw,72px) 90px">
+    <p data-reveal="" style="font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:#1C5D42;font-weight:600;margin:0 0 16px;opacity:0;transform:translateY(36px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)">Nos services</p>
+    <h2 data-reveal="" style="font-weight:700;font-size:clamp(32px,3.6vw,52px);letter-spacing:-0.03em;line-height:1.05;margin:0 0 48px;opacity:0;transform:translateY(36px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)">Trois métiers, une seule mission&nbsp;: <span style="color:#1C5D42">l'efficacité.</span></h2>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px">
+      <div data-reveal="" style="background:#fff;border:2px solid #d8d5d0;padding:32px;transition:transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s,opacity .7s ease;opacity:0;transform:translateY(36px)" style-hover="transform:translateY(-10px);box-shadow:0 20px 40px rgba(28,93,66,0.18);border-color:#1C5D42">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#1C5D42" stroke-width="2"><path d="M12 2v20M12 6l3-3M12 6L9 3M12 18l3 3M12 18l-3 3M2 12h20M6 12L3 9M6 12l-3 3M18 12l3-3M18 12l3 3"></path></svg>
+        <h3 style="font-weight:700;font-size:22px;letter-spacing:-0.01em;margin:20px 0 10px">Chauffage</h3>
+        <p style="font-size:15px;line-height:1.7;color:rgba(29,28,26,0.75);margin:0">Thermopompes murales et centrales dimensionnées pour votre maison — installation, remplacement, entretien, subventions incluses dans l'analyse.</p>
+      </div>
+      <div data-reveal="" style="background:#fff;border:2px solid #d8d5d0;padding:32px;transition:transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s,opacity .7s ease;opacity:0;transform:translateY(36px);transition-delay:.1s" style-hover="transform:translateY(-10px);box-shadow:0 20px 40px rgba(28,93,66,0.18);border-color:#1C5D42">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#1C5D42" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M12 7a5 5 0 0 1 0 10"></path></svg>
+        <h3 style="font-weight:700;font-size:22px;letter-spacing:-0.01em;margin:20px 0 10px">Climatisation</h3>
+        <p style="font-size:15px;line-height:1.7;color:rgba(29,28,26,0.75);margin:0">Un été confortable sans faire exploser le compteur — unités haute efficacité choisies pour leur rendement réel dans le climat québécois.</p>
+      </div>
+      <div data-reveal="" style="background:#fff;border:2px solid #d8d5d0;padding:32px;transition:transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s,opacity .7s ease;opacity:0;transform:translateY(36px);transition-delay:.2s" style-hover="transform:translateY(-10px);box-shadow:0 20px 40px rgba(28,93,66,0.18);border-color:#1C5D42">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#1C5D42" stroke-width="2"><path d="M3 21V10l9-7 9 7v11"></path><path d="M7 21v-8h10v8"></path></svg>
+        <h3 style="font-weight:700;font-size:22px;letter-spacing:-0.01em;margin:20px 0 10px">Isolation</h3>
+        <p style="font-size:15px;line-height:1.7;color:rgba(29,28,26,0.75);margin:0">La chaleur qu'on ne perd pas ne coûte rien. Entretoit, murs et solage — on colmate avant de vendre des équipements.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="thermopompe" style="max-width:1400px;margin:0 auto;padding:40px clamp(20px,5vw,72px) 90px;display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(24px,4vw,72px);align-items:center">
+    <figure data-reveal="" style="margin:0;position:relative;opacity:0;transform:translateY(36px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)">
+      <div id="stage3d-duo" style="width:100%;height:560px;cursor:grab"></div>
+    </figure>
+    <div>
+      <p data-reveal="" style="font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:#1C5D42;font-weight:600;margin:0 0 16px;opacity:0;transform:translateY(36px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)">Thermopompes</p>
+      <h2 data-reveal="" style="font-weight:700;font-size:clamp(28px,3vw,44px);letter-spacing:-0.025em;line-height:1.1;margin:0;opacity:0;transform:translateY(36px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)">Chauffe l'hiver, climatise l'été, économise à l'année.</h2>
+      <p data-reveal="" style="font-size:16px;line-height:1.75;color:rgba(29,28,26,0.75);margin:22px 0 0;opacity:0;transform:translateY(36px);transition:opacity .7s ease .1s,transform .7s cubic-bezier(.2,.7,.2,1) .1s">Une thermopompe bien dimensionnée remplace la fournaise ET le climatiseur. On calcule les besoins réels de votre maison, on identifie les subventions (LogisVert, Rénoclimat) et on installe proprement, en une journée quand c'est possible.</p>
+    </div>
+  </section>
+
+  <section id="isolation" style="max-width:1400px;margin:0 auto;padding:40px clamp(20px,5vw,72px) 110px;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(24px,4vw,72px);align-items:center">
+    <div>
+      <p data-reveal="" style="font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:#1C5D42;font-weight:600;margin:0 0 16px;opacity:0;transform:translateY(36px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)">Isolation</p>
+      <h2 data-reveal="" style="font-weight:700;font-size:clamp(28px,3vw,44px);letter-spacing:-0.025em;line-height:1.1;margin:0;opacity:0;transform:translateY(36px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)">On chauffait dehors. Plus maintenant.</h2>
+      <p data-reveal="" style="font-size:16px;line-height:1.75;color:rgba(29,28,26,0.75);margin:22px 0 0;opacity:0;transform:translateY(36px);transition:opacity .7s ease .1s,transform .7s cubic-bezier(.2,.7,.2,1) .1s">Avant tout équipement, on évalue l'enveloppe : entretoit, murs, solage, étanchéité. Une maison bien isolée demande un système plus petit — moins cher à l'achat, moins cher à l'usage.</p>
+    </div>
+    <figure data-reveal="" style="margin:0;position:relative;opacity:0;transform:translateY(36px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)">
+      <div id="stage3d-iso" style="width:100%;height:540px;cursor:grab"></div>
+    </figure>
+  </section>
+
+  <section style="background:#1d1c1a;color:#f6f5f2">
+    <div style="max-width:1400px;margin:0 auto;padding:90px clamp(20px,5vw,72px);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:32px">
+      <div data-reveal="" style="opacity:0;transform:translateY(36px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)"><p style="font-weight:700;font-size:clamp(40px,4vw,64px);line-height:1;color:#7FB94E;margin:0"><span data-count="30">0</span>&nbsp;%</p><p style="font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(246,245,242,0.6);margin:14px 0 0">D'économie potentielle sur le chauffage</p></div>
+      <div data-reveal="" style="opacity:0;transform:translateY(36px);transition:opacity .7s ease .1s,transform .7s cubic-bezier(.2,.7,.2,1) .1s"><p style="font-weight:700;font-size:clamp(40px,4vw,64px);line-height:1;color:#7FB94E;margin:0"><span data-count="24">0</span>&nbsp;h</p><p style="font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(246,245,242,0.6);margin:14px 0 0">Délai de réponse — soumission gratuite</p></div>
+      <div data-reveal="" style="opacity:0;transform:translateY(36px);transition:opacity .7s ease .2s,transform .7s cubic-bezier(.2,.7,.2,1) .2s"><p style="font-weight:700;font-size:clamp(40px,4vw,64px);line-height:1;color:#7FB94E;margin:0"><span data-count="3">0</span>&nbsp;en&nbsp;1</p><p style="font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(246,245,242,0.6);margin:14px 0 0">Chauffage, clim et isolation — une équipe</p></div>
+      <div data-reveal="" style="opacity:0;transform:translateY(36px);transition:opacity .7s ease .3s,transform .7s cubic-bezier(.2,.7,.2,1) .3s"><p style="font-weight:700;font-size:clamp(40px,4vw,64px);line-height:1;color:#7FB94E;margin:0"><span data-count="4">0</span>&nbsp;saisons</p><p style="font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(246,245,242,0.6);margin:14px 0 0">De confort, de janvier à juillet</p></div>
+    </div>
+  </section>
+
+  <section id="soumission" style="background:#1C5D42;color:#f6f5f2;position:relative;overflow:hidden">
+    <div style="position:absolute;right:-60px;top:50%;transform:translateY(-50%);opacity:0.14;animation:floaty 5s ease-in-out infinite"><svg width="420" height="420" viewBox="0 0 96 96"><path d="M36 92 L16 92 L16 48 L48 22 L80 48 L80 92 L60 92" fill="none" stroke="#fff" stroke-width="9"></path><path d="M48 92 L48 62" fill="none" stroke="#7FB94E" stroke-width="5"></path><path d="M48 66 C38 69 28 65 24 54 C36 51 45 57 48 66 Z" fill="#7FB94E"></path><path d="M48 66 C58 69 68 65 72 54 C60 51 51 57 48 66 Z" fill="#7FB94E"></path></svg></div>
+    <div style="max-width:1400px;margin:0 auto;padding:100px clamp(20px,5vw,72px);position:relative">
+      <h3 data-reveal="" style="font-weight:700;font-size:clamp(36px,4.4vw,64px);line-height:1.05;letter-spacing:-0.03em;margin:0;opacity:0;transform:translateY(36px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)">
+        <span style="display:block">Votre maison peut faire mieux.</span>
+        <span style="display:block;color:#7FB94E">On vous montre comment.</span>
+      </h3>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:40px">
+        <a href="#" style="display:inline-block;background:#7FB94E;color:#0e2b1f;font-weight:700;font-size:17px;padding:16px 26px;transition:transform .2s" style-hover="transform:translateY(-3px);background:#f6f5f2">Soumission gratuite — réponse en 24&nbsp;h</a>
+      </div>
+    </div>
+  </section>
+
+  <footer style="max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:48px clamp(20px,5vw,72px);font-size:13px;color:rgba(29,28,26,0.7)">
+    <svg width="22" height="22" viewBox="0 0 96 96"><path d="M36 92 L16 92 L16 48 L48 22 L80 48 L80 92 L60 92" fill="none" stroke="#1C5D42" stroke-width="9"></path><path d="M48 92 L48 62" fill="none" stroke="#7FB94E" stroke-width="5"></path><path d="M48 66 C38 69 28 65 24 54 C36 51 45 57 48 66 Z" fill="#7FB94E"></path><path d="M48 66 C58 69 68 65 72 54 C60 51 51 57 48 66 Z" fill="#7FB94E"></path></svg>
+    <span>maisonefficace.ca — Chauffage · Climatisation · Isolation. Partout au Québec.</span>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+  componentDidMount() {
+    this._cleanup = [];
+    this._scrollY = 0; this._lastY = 0; this._vel = 0;
+    this.initScroll(); this.initReveals(); this.initCursor(); this.wait3D(0);
+  }
+  componentWillUnmount() { (this._cleanup || []).forEach(fn => fn()); if (this._raf) cancelAnimationFrame(this._raf); if (this._t3) clearTimeout(this._t3); }
+  initScroll() {
+    const bar = document.getElementById('progress-bar');
+    const onScroll = () => {
+      const h = document.documentElement;
+      const p = h.scrollTop / Math.max(1, h.scrollHeight - h.clientHeight);
+      if (bar) bar.style.width = (p * 100) + '%';
+      this._scrollY = h.scrollTop;
+    };
+    addEventListener('scroll', onScroll, { passive: true }); onScroll();
+    this._cleanup.push(() => removeEventListener('scroll', onScroll));
+  }
+  initCursor() {
+    const dot = document.getElementById('cursor-dot');
+    const onMove = e => { if (dot) dot.style.transform = 'translate(' + (e.clientX - 7) + 'px,' + (e.clientY - 7) + 'px)'; };
+    addEventListener('mousemove', onMove, { passive: true });
+    this._cleanup.push(() => removeEventListener('mousemove', onMove));
+  }
+  initReveals() {
+    const els = Array.from(document.querySelectorAll('[data-reveal]'));
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(en => { if (en.isIntersecting) { en.target.style.opacity = '1'; en.target.style.transform = 'none'; io.unobserve(en.target); } });
+    }, { threshold: 0.18 });
+    els.forEach(el => io.observe(el));
+    const counters = Array.from(document.querySelectorAll('[data-count]'));
+    const io2 = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        if (!en.isIntersecting) return; io2.unobserve(en.target);
+        const target = parseInt(en.target.getAttribute('data-count'), 10); const t0 = performance.now();
+        const tick = now => { const k = Math.min(1, (now - t0) / 1400); const e = 1 - Math.pow(1 - k, 3); en.target.textContent = Math.round(target * e); if (k < 1) requestAnimationFrame(tick); };
+        requestAnimationFrame(tick);
+      });
+    }, { threshold: 0.5 });
+    counters.forEach(el => io2.observe(el));
+    this._cleanup.push(() => { io.disconnect(); io2.disconnect(); });
+  }
+  wait3D(tries) {
+    if (window.THREE) { this.init3D(); this.init3DDuo(); this.init3DIso(); return; }
+    if (tries < 80) this._t3 = setTimeout(() => this.wait3D(tries + 1), 100);
+  }
+  init3DDuo() {
+    const T = window.THREE;
+    const host = document.getElementById('stage3d-duo');
+    if (!host) return;
+    const scene = new T.Scene();
+    const cam = new T.PerspectiveCamera(34, 1, 0.1, 100);
+    cam.position.set(0, 0.5, 7.6);
+    const renderer = new T.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(2, devicePixelRatio));
+    host.appendChild(renderer.domElement);
+    const size = () => { const w = host.clientWidth, h = host.clientHeight; renderer.setSize(w, h); cam.aspect = w / h; cam.updateProjectionMatrix(); };
+    size(); addEventListener('resize', size);
+    this._cleanup.push(() => { removeEventListener('resize', size); renderer.dispose(); if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement); });
+    scene.add(new T.AmbientLight(0xffffff, 0.65));
+    const key = new T.DirectionalLight(0xffffff, 0.9); key.position.set(4, 6, 6); scene.add(key);
+    const rim = new T.DirectionalLight(0x7FB94E, 0.5); rim.position.set(-6, 2, -4); scene.add(rim);
+    const matBody = new T.MeshStandardMaterial({ color: 0xf5f5f3, roughness: 0.38, metalness: 0.08 });
+    const matPanel = new T.MeshStandardMaterial({ color: 0xe9e8e5, roughness: 0.5, metalness: 0.05 });
+    const matGrille = new T.MeshStandardMaterial({ color: 0xdedddb, roughness: 0.55 });
+    const matDark = new T.MeshStandardMaterial({ color: 0x232322, roughness: 0.7 });
+    const matGray = new T.MeshStandardMaterial({ color: 0x8f8f8b, roughness: 0.6 });
+    const matGreen = new T.MeshStandardMaterial({ color: 0x1C5D42, roughness: 0.5 });
+    const matCopper = new T.MeshStandardMaterial({ color: 0xb08d57, roughness: 0.35, metalness: 0.6 });
+    const matCab = new T.MeshStandardMaterial({ color: 0xd3d4d6, roughness: 0.45, metalness: 0.15 });
+    const duo = new T.Group();
+    // outdoor unit (right, smaller)
+    const outdoor = new T.Group();
+    const W = 3.1, H = 2.15, D = 1.15, zF = D / 2;
+    outdoor.add(new T.Mesh(new T.BoxGeometry(W, H, D), matBody));
+    const lid = new T.Mesh(new T.BoxGeometry(W + 0.1, 0.1, D + 0.1), matPanel); lid.position.y = H / 2 + 0.05; outdoor.add(lid);
+    const baseRail = new T.Mesh(new T.BoxGeometry(W + 0.06, 0.14, D + 0.06), matGray); baseRail.position.y = -H / 2 - 0.06; outdoor.add(baseRail);
+    const footL = new T.Mesh(new T.BoxGeometry(0.45, 0.16, D * 0.95), matDark); footL.position.set(-(W / 2 - 0.4), -H / 2 - 0.21, 0); outdoor.add(footL);
+    const footR = footL.clone(); footR.position.x = W / 2 - 0.4; outdoor.add(footR);
+    const fx = -0.55, fy = 0.05, fr = 0.88;
+    const recess = new T.Mesh(new T.CircleGeometry(fr, 56), matDark); recess.position.set(fx, fy, zF + 0.004); outdoor.add(recess);
+    const bezel = new T.Mesh(new T.TorusGeometry(fr + 0.015, 0.03, 12, 64), matPanel); bezel.position.set(fx, fy, zF + 0.01); outdoor.add(bezel);
+    const fan = new T.Group(); fan.position.set(fx, fy, zF + 0.045);
+    for (let i = 0; i < 3; i++) {
+      const blade = new T.Mesh(new T.BoxGeometry(0.42, 0.72, 0.04), matGray);
+      blade.position.y = 0.42; blade.rotation.x = 0.45; blade.rotation.y = 0.15;
+      const arm = new T.Group(); arm.add(blade); arm.rotation.z = i * (Math.PI * 2 / 3); fan.add(arm);
+    }
+    const hub = new T.Mesh(new T.CylinderGeometry(0.13, 0.13, 0.1, 24), matGreen); hub.rotation.x = Math.PI / 2; fan.add(hub);
+    outdoor.add(fan);
+    [0.22, 0.42, 0.62, 0.82].forEach(r => {
+      const ring = new T.Mesh(new T.TorusGeometry(r, 0.02, 10, 64), matGrille); ring.position.set(fx, fy, zF + 0.08); outdoor.add(ring);
+    });
+    for (let off = -0.75; off <= 0.76; off += 0.25) {
+      const half = Math.sqrt(Math.max(0.01, fr * fr - off * off));
+      const bar = new T.Mesh(new T.BoxGeometry(0.035, half * 2, 0.02), matGrille);
+      bar.position.set(fx + off, fy, zF + 0.1); outdoor.add(bar);
+    }
+    const seam = new T.Mesh(new T.BoxGeometry(0.018, H - 0.12, 0.015), matGray); seam.position.set(0.52, 0, zF + 0.005); outdoor.add(seam);
+    const plate = new T.Mesh(new T.BoxGeometry(0.55, 0.24, 0.02), matGreen); plate.position.set(1.0, 0.68, zF + 0.012); outdoor.add(plate);
+    outdoor.scale.setScalar(0.72); outdoor.position.set(1.55, -0.85, 0.15); duo.add(outdoor);
+    // central air handler (left, tall cabinet)
+    const cab = new T.Group();
+    const cW = 1.75, cH = 3.5, cD = 1.45, cz = cD / 2;
+    cab.add(new T.Mesh(new T.BoxGeometry(cW, cH, cD), matCab));
+    const cabTop = new T.Mesh(new T.BoxGeometry(cW + 0.06, 0.08, cD + 0.06), matPanel); cabTop.position.y = cH / 2 + 0.04; cab.add(cabTop);
+    const plinth = new T.Mesh(new T.BoxGeometry(cW + 0.04, 0.14, cD + 0.04), matGray); plinth.position.y = -cH / 2 - 0.06; cab.add(plinth);
+    const hseam = new T.Mesh(new T.BoxGeometry(cW - 0.06, 0.02, 0.015), matGray); hseam.position.set(0, -0.35, cz + 0.005); cab.add(hseam);
+    const upPanel = new T.Mesh(new T.BoxGeometry(cW - 0.18, cH / 2 - 0.55, 0.03), matCab); upPanel.position.set(0, 0.72, cz + 0.01); cab.add(upPanel);
+    const loPanel = new T.Mesh(new T.BoxGeometry(cW - 0.18, cH / 2 - 0.45, 0.03), matCab); loPanel.position.set(0, -1.05, cz + 0.01); cab.add(loPanel);
+    const knock = new T.Mesh(new T.BoxGeometry(0.32, 0.32, 0.012), matPanel); knock.position.set(0.25, 1.35, cz + 0.03); cab.add(knock);
+    const brand = new T.Mesh(new T.BoxGeometry(0.55, 0.16, 0.02), matGreen); brand.position.set(-0.35, 0.95, cz + 0.03); cab.add(brand);
+    const p1 = new T.Mesh(new T.CylinderGeometry(0.06, 0.06, 0.16, 14), matDark); p1.rotation.x = Math.PI / 2; p1.position.set(-0.55, -1.0, cz + 0.06); cab.add(p1);
+    const p2 = p1.clone(); p2.position.set(-0.62, -1.35, cz + 0.06); cab.add(p2);
+    const p3 = new T.Mesh(new T.CylinderGeometry(0.035, 0.035, 0.2, 12), matCopper); p3.rotation.x = Math.PI / 2; p3.position.set(-0.45, -0.72, cz + 0.07); cab.add(p3);
+    const sidePorts = new T.Mesh(new T.BoxGeometry(0.03, 0.6, 0.5), matPanel); sidePorts.position.set(cW / 2 + 0.01, 0.9, 0); cab.add(sidePorts);
+    cab.position.set(-1.5, 0.05, 0); duo.add(cab);
+    duo.scale.setScalar(0.82); duo.rotation.y = 0.3; scene.add(duo);
+    let dragX = 0, dragging = false, lastPX = 0;
+    const down = e => { dragging = true; lastPX = e.clientX; host.style.cursor = 'grabbing'; };
+    const up = () => { dragging = false; host.style.cursor = 'grab'; };
+    const move = e => { if (dragging) { dragX += (e.clientX - lastPX) * 0.008; lastPX = e.clientX; } };
+    host.addEventListener('pointerdown', down); addEventListener('pointerup', up); addEventListener('pointermove', move);
+    this._cleanup.push(() => { host.removeEventListener('pointerdown', down); removeEventListener('pointerup', up); removeEventListener('pointermove', move); });
+    const animate = t => {
+      this._rafDuo = requestAnimationFrame(animate);
+      const targetY = 0.3 + this._scrollY * 0.0006 + dragX;
+      duo.rotation.y += (targetY - duo.rotation.y) * 0.05;
+      duo.position.y = Math.sin(t * 0.001) * 0.05;
+      fan.rotation.z -= 0.06;
+      renderer.render(scene, cam);
+    };
+    this._rafDuo = requestAnimationFrame(animate);
+    this._cleanup.push(() => { if (this._rafDuo) cancelAnimationFrame(this._rafDuo); });
+  }
+  init3DIso() {
+    const T = window.THREE;
+    const host = document.getElementById('stage3d-iso');
+    if (!host) return;
+    const scene = new T.Scene();
+    const cam = new T.PerspectiveCamera(34, 1, 0.1, 100);
+    cam.position.set(0, 0.7, 7.4);
+    const renderer = new T.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(2, devicePixelRatio));
+    host.appendChild(renderer.domElement);
+    const size = () => { const w = host.clientWidth, h = host.clientHeight; renderer.setSize(w, h); cam.aspect = w / h; cam.updateProjectionMatrix(); };
+    size(); addEventListener('resize', size);
+    this._cleanup.push(() => { removeEventListener('resize', size); renderer.dispose(); if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement); });
+    scene.add(new T.AmbientLight(0xffffff, 0.7));
+    const key = new T.DirectionalLight(0xffffff, 0.85); key.position.set(4, 6, 6); scene.add(key);
+    const rim = new T.DirectionalLight(0x7FB94E, 0.4); rim.position.set(-6, 2, -4); scene.add(rim);
+    const matSteel = new T.MeshStandardMaterial({ color: 0xc9cbcd, roughness: 0.35, metalness: 0.7 });
+    const matGreen = new T.MeshStandardMaterial({ color: 0x1C5D42, roughness: 0.5 });
+    const matDark = new T.MeshStandardMaterial({ color: 0x232322, roughness: 0.7 });
+    const matGray = new T.MeshStandardMaterial({ color: 0x8f8f8b, roughness: 0.6 });
+    const matHose = new T.MeshStandardMaterial({ color: 0xe6b7c3, roughness: 0.8 });
+    const matPinkRib = new T.MeshStandardMaterial({ color: 0xd095a4, roughness: 0.85 });
+    const matPink = new T.MeshStandardMaterial({ color: 0xf0c9cf, roughness: 1 });
+    const matMachine = new T.MeshStandardMaterial({ color: 0x8b8e91, roughness: 0.5, metalness: 0.3 });
+    const matRed = new T.MeshStandardMaterial({ color: 0xb92c2c, roughness: 0.5 });
+    const m = new T.Group();
+    // AttiCat-style blowing machine: graphite tower, screen, side discharge
+    const lower = new T.Mesh(new T.BoxGeometry(1.4, 1.1, 1.15), matMachine); lower.position.set(0.45, -0.55, 0); m.add(lower);
+    const upper = new T.Mesh(new T.BoxGeometry(1.15, 1.5, 0.98), matMachine); upper.position.set(0.45, 0.7, -0.05); m.add(upper);
+    const hood = new T.Mesh(new T.BoxGeometry(1.17, 0.3, 1.0), matGray); hood.position.set(0.45, 1.5, -0.05); m.add(hood);
+    const screenBezel = new T.Mesh(new T.BoxGeometry(0.72, 0.55, 0.03), matDark); screenBezel.position.set(0.45, 0.85, 0.46); m.add(screenBezel);
+    const screenGlass = new T.Mesh(new T.BoxGeometry(0.6, 0.42, 0.02), new T.MeshStandardMaterial({ color: 0x3a4a52, roughness: 0.25, metalness: 0.4 })); screenGlass.position.set(0.45, 0.85, 0.485); m.add(screenGlass);
+    const lbl1 = new T.Mesh(new T.BoxGeometry(0.3, 0.12, 0.015), matRed); lbl1.position.set(0.12, 1.32, 0.44); m.add(lbl1);
+    const lbl2 = new T.Mesh(new T.BoxGeometry(0.22, 0.1, 0.015), matRed); lbl2.position.set(0.78, 1.32, 0.44); m.add(lbl2);
+    const brandM = new T.Mesh(new T.BoxGeometry(0.5, 0.16, 0.015), matGreen); brandM.position.set(0.45, -0.3, 0.585); m.add(brandM);
+    // side discharge chute (angled, feeds the hose)
+    const chute = new T.Mesh(new T.BoxGeometry(0.55, 0.4, 0.45), matMachine); chute.position.set(1.2, 1.05, -0.05); chute.rotation.z = -0.45; m.add(chute);
+    const chuteMouth = new T.Mesh(new T.CylinderGeometry(0.15, 0.15, 0.25, 16), matDark); chuteMouth.rotation.z = Math.PI / 2 + 0.45; chuteMouth.position.set(1.45, 0.95, -0.05); m.add(chuteMouth);
+    // base, feet, wheels
+    const base = new T.Mesh(new T.BoxGeometry(1.5, 0.12, 1.2), matDark); base.position.set(0.45, -1.16, 0); m.add(base);
+    const mkWheel = z => { const w = new T.Mesh(new T.CylinderGeometry(0.22, 0.22, 0.12, 24), matDark); w.rotation.x = Math.PI / 2; w.position.set(-0.1, -1.3, z); m.add(w); const hub = new T.Mesh(new T.CylinderGeometry(0.07, 0.07, 0.14, 16), matGray); hub.rotation.x = Math.PI / 2; hub.position.copy(w.position); m.add(hub); };
+    mkWheel(0.5); mkWheel(-0.5);
+    const foot = new T.Mesh(new T.BoxGeometry(0.18, 0.14, 1.1), matGray); foot.position.set(1.0, -1.29, 0); m.add(foot);
+    // pink ribbed hose: out of the chute, coiling down then out to the left
+    const curve = new T.CatmullRomCurve3([new T.Vector3(1.55, 0.9, 0.0), new T.Vector3(1.85, 0.1, 0.45), new T.Vector3(0.9, -0.85, 0.7), new T.Vector3(-0.9, -0.95, 0.55), new T.Vector3(-2.05, -0.6, 0.3)]);
+    const hose = new T.Mesh(new T.TubeGeometry(curve, 56, 0.12, 12, false), matHose); m.add(hose);
+    for (let i = 1; i <= 12; i++) { const p = curve.getPoint(i / 13); const rib = new T.Mesh(new T.TorusGeometry(0.13, 0.018, 8, 20), matPinkRib); rib.position.copy(p); const tn = curve.getTangent(i / 13); rib.lookAt(p.clone().add(tn)); m.add(rib); }
+    const tip = curve.getPoint(1), tan = curve.getTangent(1);
+    const nozzle = new T.Mesh(new T.CylinderGeometry(0.11, 0.15, 0.3, 14), matDark);
+    nozzle.position.copy(tip); nozzle.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), tan); m.add(nozzle);
+    // floor fluff pile
+    [[-2.6, -1.15, 0.2, 0.55], [-2.0, -1.2, -0.1, 0.45], [-3.1, -1.2, -0.15, 0.4]].forEach(([x, y, z, r]) => {
+      const s = new T.Mesh(new T.SphereGeometry(r, 20, 14), matPink); s.scale.y = 0.35; s.position.set(x, y, z); m.add(s);
+    });
+    // fiberglass spray particles
+    const N = 260, pos = new Float32Array(N * 3), vel = [], life = [];
+    const spawn = i => {
+      pos[i * 3] = tip.x; pos[i * 3 + 1] = tip.y; pos[i * 3 + 2] = tip.z;
+      const d = tan.clone().multiplyScalar(1.6 + Math.random() * 1.4);
+      d.x += (Math.random() - 0.5) * 0.7; d.y += (Math.random() - 0.5) * 0.7; d.z += (Math.random() - 0.5) * 0.7;
+      vel[i] = d; life[i] = Math.random() * 1.6;
+    };
+    for (let i = 0; i < N; i++) { spawn(i); life[i] = Math.random() * 1.6; }
+    const geo = new T.BufferGeometry(); geo.setAttribute('position', new T.BufferAttribute(pos, 3));
+    const pts = new T.Points(geo, new T.PointsMaterial({ color: 0xf3ccd3, size: 0.09, transparent: true, opacity: 0.95 }));
+    m.add(pts);
+    m.position.set(0.4, 0.1, 0); m.rotation.y = -0.35; scene.add(m);
+    let dragX = 0, dragging = false, lastPX = 0;
+    const down = e => { dragging = true; lastPX = e.clientX; host.style.cursor = 'grabbing'; };
+    const up = () => { dragging = false; host.style.cursor = 'grab'; };
+    const move = e => { if (dragging) { dragX += (e.clientX - lastPX) * 0.008; lastPX = e.clientX; } };
+    host.addEventListener('pointerdown', down); addEventListener('pointerup', up); addEventListener('pointermove', move);
+    this._cleanup.push(() => { host.removeEventListener('pointerdown', down); removeEventListener('pointerup', up); removeEventListener('pointermove', move); });
+    let last = performance.now();
+    const animate = t => {
+      this._rafIso = requestAnimationFrame(animate);
+      const dt = Math.min(0.05, (t - last) / 1000); last = t;
+      const targetY = -0.35 + this._scrollY * 0.0012 + dragX;
+      m.rotation.y += (targetY - m.rotation.y) * 0.08;
+      m.position.y = 0.1 + Math.sin(t * 0.0011) * 0.05;
+      for (let i = 0; i < N; i++) {
+        life[i] += dt;
+        if (life[i] > 1.7 || pos[i * 3 + 1] < -1.5) { spawn(i); continue; }
+        vel[i].y -= 2.6 * dt;
+        pos[i * 3] += vel[i].x * dt; pos[i * 3 + 1] += vel[i].y * dt; pos[i * 3 + 2] += vel[i].z * dt;
+      }
+      geo.attributes.position.needsUpdate = true;
+      renderer.render(scene, cam);
+    };
+    this._rafIso = requestAnimationFrame(animate);
+    this._cleanup.push(() => { if (this._rafIso) cancelAnimationFrame(this._rafIso); });
+  }
+  init3D() {
+    const T = window.THREE;
+    const host = document.getElementById('stage3d');
+    if (!host) return;
+    const scene = new T.Scene();
+    const cam = new T.PerspectiveCamera(32, 1, 0.1, 100);
+    cam.position.set(0, 0.4, 7.2);
+    const renderer = new T.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(2, devicePixelRatio));
+    host.appendChild(renderer.domElement);
+    const size = () => { const w = host.clientWidth, h = host.clientHeight; renderer.setSize(w, h); cam.aspect = w / h; cam.updateProjectionMatrix(); };
+    size(); addEventListener('resize', size);
+    this._cleanup.push(() => { removeEventListener('resize', size); renderer.dispose(); if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement); });
+    scene.add(new T.AmbientLight(0xffffff, 0.65));
+    const key = new T.DirectionalLight(0xffffff, 0.9); key.position.set(4, 6, 6); scene.add(key);
+    const rim = new T.DirectionalLight(0x7FB94E, 0.5); rim.position.set(-6, 2, -4); scene.add(rim);
+    const matBody = new T.MeshStandardMaterial({ color: 0xf5f5f3, roughness: 0.38, metalness: 0.08 });
+    const matPanel = new T.MeshStandardMaterial({ color: 0xe9e8e5, roughness: 0.5, metalness: 0.05 });
+    const matGrille = new T.MeshStandardMaterial({ color: 0xdedddb, roughness: 0.55 });
+    const matDark = new T.MeshStandardMaterial({ color: 0x232322, roughness: 0.7 });
+    const matGray = new T.MeshStandardMaterial({ color: 0x8f8f8b, roughness: 0.6 });
+    const matGreen = new T.MeshStandardMaterial({ color: 0x1C5D42, roughness: 0.5 });
+    const matCopper = new T.MeshStandardMaterial({ color: 0xb08d57, roughness: 0.35, metalness: 0.6 });
+    const matCab = new T.MeshStandardMaterial({ color: 0xd3d4d6, roughness: 0.45, metalness: 0.15 });
+    const pump = new T.Group();
+    // — outdoor unit (right) —
+    const outdoor = new T.Group();
+    const W = 3.1, H = 2.15, D = 1.15, zF = D / 2;
+    outdoor.add(new T.Mesh(new T.BoxGeometry(W, H, D), matBody));
+    const lid = new T.Mesh(new T.BoxGeometry(W + 0.1, 0.1, D + 0.1), matPanel); lid.position.y = H / 2 + 0.05; outdoor.add(lid);
+    const baseRail = new T.Mesh(new T.BoxGeometry(W + 0.06, 0.14, D + 0.06), matGray); baseRail.position.y = -H / 2 - 0.06; outdoor.add(baseRail);
+    const footL = new T.Mesh(new T.BoxGeometry(0.45, 0.16, D * 0.95), matDark); footL.position.set(-(W / 2 - 0.4), -H / 2 - 0.21, 0); outdoor.add(footL);
+    const footR = footL.clone(); footR.position.x = W / 2 - 0.4; outdoor.add(footR);
+    const fx = -0.55, fy = 0.05, fr = 0.88;
+    const recess = new T.Mesh(new T.CircleGeometry(fr, 56), matDark); recess.position.set(fx, fy, zF + 0.004); outdoor.add(recess);
+    const bezel = new T.Mesh(new T.TorusGeometry(fr + 0.015, 0.03, 12, 64), matPanel); bezel.position.set(fx, fy, zF + 0.01); outdoor.add(bezel);
+    const fan = new T.Group(); fan.position.set(fx, fy, zF + 0.045);
+    for (let i = 0; i < 3; i++) {
+      const blade = new T.Mesh(new T.BoxGeometry(0.42, 0.72, 0.04), matGray);
+      blade.position.y = 0.42; blade.rotation.x = 0.45; blade.rotation.y = 0.15;
+      const arm = new T.Group(); arm.add(blade); arm.rotation.z = i * (Math.PI * 2 / 3); fan.add(arm);
+    }
+    const hub = new T.Mesh(new T.CylinderGeometry(0.13, 0.13, 0.1, 24), matGreen); hub.rotation.x = Math.PI / 2; fan.add(hub);
+    outdoor.add(fan); this._fan = fan;
+    [0.22, 0.42, 0.62, 0.82].forEach(r => {
+      const ring = new T.Mesh(new T.TorusGeometry(r, 0.02, 10, 64), matGrille); ring.position.set(fx, fy, zF + 0.08); outdoor.add(ring);
+    });
+    for (let off = -0.75; off <= 0.76; off += 0.25) {
+      const half = Math.sqrt(Math.max(0.01, fr * fr - off * off));
+      const bar = new T.Mesh(new T.BoxGeometry(0.035, half * 2, 0.02), matGrille);
+      bar.position.set(fx + off, fy, zF + 0.1); outdoor.add(bar);
+    }
+    const seam = new T.Mesh(new T.BoxGeometry(0.018, H - 0.12, 0.015), matGray); seam.position.set(0.52, 0, zF + 0.005); outdoor.add(seam);
+    const plate = new T.Mesh(new T.BoxGeometry(0.55, 0.24, 0.02), matGreen); plate.position.set(1.0, 0.68, zF + 0.012); outdoor.add(plate);
+    for (let i = 0; i < 3; i++) {
+      const vent = new T.Mesh(new T.BoxGeometry(0.015, 1.25, 0.09), matGray);
+      vent.position.set(W / 2 + 0.008, 0.1, -0.28 + i * 0.28); outdoor.add(vent);
+    }
+    const ctrl = new T.Mesh(new T.BoxGeometry(0.05, 0.55, 0.4), matPanel); ctrl.position.set(W / 2 + 0.02, 0.6, -0.15); outdoor.add(ctrl);
+    const svc = new T.Mesh(new T.BoxGeometry(0.22, 0.6, 0.45), matPanel); svc.position.set(W / 2 + 0.1, -0.55, 0.18); outdoor.add(svc);
+    const v1 = new T.Mesh(new T.CylinderGeometry(0.055, 0.055, 0.2, 16), matDark); v1.position.set(W / 2 + 0.18, -0.45, 0.28); v1.rotation.z = Math.PI / 2; outdoor.add(v1);
+    const v2 = v1.clone(); v2.position.y = -0.68; outdoor.add(v2);
+    const c1 = new T.Mesh(new T.CylinderGeometry(0.028, 0.028, 0.5, 12), matCopper); c1.position.set(W / 2 + 0.22, -0.85, 0.28); outdoor.add(c1);
+    const c2 = new T.Mesh(new T.CylinderGeometry(0.02, 0.02, 0.5, 12), matCopper); c2.position.set(W / 2 + 0.22, -0.85, 0.12); outdoor.add(c2);
+    outdoor.scale.setScalar(1);
+    pump.add(outdoor);
+    pump.scale.setScalar(0.92); pump.rotation.y = 0.3; scene.add(pump);
+    let dragX = 0, dragging = false, lastPX = 0;
+    const down = e => { dragging = true; lastPX = e.clientX; host.style.cursor = 'grabbing'; };
+    const up = () => { dragging = false; host.style.cursor = 'grab'; };
+    const move = e => { if (dragging) { dragX += (e.clientX - lastPX) * 0.008; lastPX = e.clientX; } };
+    host.addEventListener('pointerdown', down); addEventListener('pointerup', up); addEventListener('pointermove', move);
+    this._cleanup.push(() => { host.removeEventListener('pointerdown', down); removeEventListener('pointerup', up); removeEventListener('pointermove', move); });
+    const animate = t => {
+      this._raf = requestAnimationFrame(animate);
+      this._vel += (this._scrollY - this._lastY) * 0.0004; this._lastY = this._scrollY; this._vel *= 0.92;
+      const targetY = 0.3 + this._scrollY * 0.0011 + dragX;
+      pump.rotation.y += (targetY - pump.rotation.y) * 0.05;
+      pump.rotation.x = 0.04 + Math.sin(this._scrollY * 0.001) * 0.06;
+      pump.position.y = Math.sin(t * 0.0012) * 0.07;
+      fan.rotation.z -= 0.06 + Math.min(0.15, Math.abs(this._vel) * 8);
+      renderer.render(scene, cam);
+    };
+    this._raf = requestAnimationFrame(animate);
+  }
+}
+</script>
+</body>
+</html>
