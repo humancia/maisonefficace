@@ -39,9 +39,9 @@ if '<title>' not in html:
     marker = '<script src="./support.js"></script>'
     html = html.replace(marker, head_inject + marker, 1)
 
-with io.open('site/index.html', 'w', encoding='utf-8') as f:
+with io.open('docs/index.html', 'w', encoding='utf-8') as f:
     f.write(html)
-print('✅ site/index.html mis à jour')
+print('✅ docs/index.html mis à jour')
 PY
 
 if [ -d .git ]; then

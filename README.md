@@ -3,7 +3,7 @@
 Site vitrine — Thermopompes, climatisation et isolation au Québec.
 
 - Conçu dans **Claude Design** (projet « maisoneffica.ca », fichier `Site maisonefficace v2`)
-- `site/` — le site déployé (export Design + runtime autonome `support.js` + `overrides.css` responsive)
+- `docs/` — le site déployé (export Design + runtime autonome `support.js` + `overrides.css` responsive)
 - `sync.sh` — republie le dernier export téléchargé depuis Claude Design
 
 ## Mettre à jour le site
