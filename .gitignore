@@ -1,2 +1,4 @@
 .DS_Store
 node_modules/
+.https-watch.sh
+.https-watch.log
